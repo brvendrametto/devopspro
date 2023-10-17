@@ -1,0 +1,44 @@
+#Desafio 01 - MongoDB em containers
+# Crie um docker compose com o banco de dados MongoDB 
+#e a ferramenta de interface Mongo Express (https://github.com/mongo-express/mongo-express). 
+#Assim, você terá um ambiente em containers pra utilizar esse banco de dados.
+version: '3.8'
+
+volumes:
+  mongo_vol:
+
+networks:
+  mongo_net:
+    driver: bridge
+
+services:
+  mongo-express:
+    image: brvendrametto/mongo-express:v1
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    restart: always
+    ports:
+      - 8081:8081
+    networks:
+      - mongo_net
+    depends_on:
+      - mongodb
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: mongouser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongopwd
+      ME_CONFIG_SITE_COOKIESECRET: mongocookie
+      ME_CONFIG_MONGODB_URL: mongodb://mongouser:mongopwd@mongodb:27017/
+
+  mongodb:
+    image: mongo:4.4.3
+    restart: always    
+    ports:
+      - 27017:27017
+    networks:
+      - mongo_net
+    volumes:
+      - mongo_vol:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopwd
