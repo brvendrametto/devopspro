@@ -1,0 +1,41 @@
+#Desafio 02 - MariaDB em containers
+#Crie um docker compose com o banco de dados MariaDB 
+#e a ferramenta de interface phpMyAdmin (https://www.phpmyadmin.net).
+version: '3.1'
+
+volumes:
+  maria_vol:
+
+networks:
+  maria_net:
+    driver: bridge
+
+services:
+  phpMyAdmin:
+    image: phpmyadmin:5
+    restart: always
+    expose:
+      - "40001"
+    ports:
+      - "40001:80"
+    networks:
+      - maria_net
+    depends_on:
+      - mariadb
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306 
+
+  mariadb:
+    image: mariadb:10.6
+    restart: always
+    networks:
+      - maria_net
+    volumes:
+      - maria_vol:/data/db
+    environment:
+      MARIADB_ROOT_PASSWORD: mariapwd
+    expose:
+        - "40000"
+    ports:
+        - "40000:3306"
