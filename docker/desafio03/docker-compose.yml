@@ -1,0 +1,44 @@
+# Desafio 03 - PostgreSQL em containers
+# Mais um banco de dados bastante utilizado no mercado. 
+# Crie um docker compose com o banco de dados PostgreSQL 
+# e a ferramenta de interface pgAdmin (https://www.pgadmin.org).
+
+version: '3.1'
+
+networks:
+  postgre_net:
+    driver: bridge
+
+volumes:
+  postgre_vol:
+
+services:
+  pgAdmin:
+    image: dpage/pgadmin4:7
+    restart: always
+    expose:
+      - 80
+      - 443
+    ports:
+      - 8080:80
+    networks:
+      - postgre_net
+    depends_on:
+      - postgreSQL
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pg@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: pgpwd
+
+  postgreSQL:
+    image: postgres:16
+    restart: always
+    ports:
+      - 8081:5432
+    networks:
+      - postgre_net
+    volumes:
+      - postgre_vol:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgresusr
+      POSTGRES_PASSWORD: postgrespwd
+
