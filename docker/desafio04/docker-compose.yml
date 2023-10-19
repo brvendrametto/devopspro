@@ -1,0 +1,41 @@
+# Crie um docker compose com o banco de dados Redis 
+# e a ferramenta de interface Redis Commander 
+# (https://hub.docker.com/r/rediscommander/redis-commander).
+
+version: '3.1'
+
+volumes:
+  redis_vol:
+
+networks:
+  redis_net:
+    driver: bridge
+
+services:
+  rediscommander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    ports:
+      - 8081:8081
+    networks:
+      - redis_net
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_HOSTS=local:redis:6379
+      #- REDIS_PASSWORD=
+      #- REDIS_DB=
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.2.1-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - redis_net
+    volumes:
+      - redis_vol:/var/lib/redis/data
+    environment:
+      - name=value
+  
