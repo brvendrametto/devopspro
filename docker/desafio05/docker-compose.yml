@@ -1,0 +1,43 @@
+# Depois de fixar a criação de ambientes em containers para banco de dados, 
+# o objetivo agora é subir uma solução já existente no mercado: 
+# uma solução Wordpress em containers !!! 
+# Crie o seu docker compose utilizando a imagem oficial do Wordpress: https://hub.docker.com/_/wordpress
+
+version: '3.1'
+
+networks:
+  wordpress_net:
+    driver: bridge
+
+volumes:
+  wordpress_vol:
+  mysql_vol:
+
+services:
+  wordpress:
+    image: wordpress:6.3.2-apache
+    ports:
+      - 8080:80
+    restart: always
+    networks:
+      - wordpress_net
+    volumes:
+      - wordpress_vol:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: "wppwd"
+      WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    networks:
+      - wordpress_net
+    volumes:
+      - mysql_vol:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: "wppwd"
